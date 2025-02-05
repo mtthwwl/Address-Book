@@ -1,7 +1,7 @@
 const form = document.querySelector('form');
 const thead = document.querySelector('thead');
 const nameInput = document.querySelector('#name');
-const comData = document.querySelector('#data');
+const conData = document.querySelector('#data');
 const addressInput = document.querySelector('#address');
 const phoneInput = document.querySelector('#phone');
 const emailInput = document.querySelector('#email');
@@ -13,7 +13,7 @@ window.onload = () => {
     
     request.onerror = () =>{
         console.log('Database failed to open');
-    }
+    };
 
     request.onesuccess = () =>{
         console.log('Database opened successfully');
@@ -52,7 +52,7 @@ window.onload = () => {
             }
         }
         displayData();
-    }
+    };
 
     request.onupgradeneeded = (e) => {
         let db = e.target.result;
@@ -65,14 +65,15 @@ window.onload = () => {
         objectStore.createindex('url', 'url', {unique: false});
 
         console.log('Database setup complete');
-    }
+    };
 
     function displayData(){
         if(!db.objectStoreNames.contains('contacts')){
-            console.log('No contacts in database');
+            console.error('Contacts object store does not exist');
             conData.innerHTML= '<p>No contacts in database</p>';
+            db.createObjectStore('contacts', {keyPath: 'id'});
             return;
-        }
+        };
 
         conData.innerHTML = '';
 
@@ -103,11 +104,40 @@ window.onload = () => {
                 tr.appendChild(tdEmail);
                 tr.appendChild(tdUrl);
 
+                let tdAction = document.createElement('td');
+                let deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.setAttribute('data-contact-id', cursor.value.id);
+                deleteBtn.addEventListener('click', deleteItem);
+                tdAction.appendChild(deleteBtn);
+                tr.appendChild(tdAction);
+
                 conData.appendChild(tr);
 
                 cursor.continue();
-            }
-        }
-    }
-}
+            } else{
+                if(!conData.firstChild){
+                    let para = document.createElement('p');
+                    para.textContent = 'No contacts found';
+                    conData.appendChild(para);
+                };
+            };
+        };
+    };
+
+    function deleteItem(e){
+        let id = Number(e.target.getAttribute('data-contact-id'));
+        let objectStore = db.transaction('contacts', 'readwrite').objectStore('contacts');
+        let request = objectStore.delete(id);
+
+        request.onesuccess = () =>{
+            console.log('Item deleted from database');
+            displayData();
+        };
+
+        request.oneerror = () =>{
+            console.log('Item not deleted from database');
+        };
+    };
+};
 
