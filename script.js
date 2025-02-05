@@ -15,7 +15,7 @@ window.onload = () => {
         console.log('Database failed to open');
     };
 
-    request.onesuccess = () =>{
+    request.onsuccess = () =>{
         console.log('Database opened successfully');
         db = request.result;
 
@@ -23,7 +23,7 @@ window.onload = () => {
             e.preventDefault();
             let newItem = {
                 name: nameInput.value, 
-                adress: addressInput.value,
+                address: addressInput.value,
                 phone: phoneInput.value,
                 email: emailInput.value,
                 url: urlInput.value
@@ -33,7 +33,7 @@ window.onload = () => {
             let objectStore = transaction.objectStore('contacts');
             var request = objectStore.add(newItem);
     
-            request.onesuccess = () =>{
+            request.onsuccess = () =>{
                 console.log('Item added to database');
                 nameInput.value = "";
                 addressInput.value = "";
@@ -42,11 +42,11 @@ window.onload = () => {
                 urlInput.value = "";
             }
     
-            request.oneerror = () =>{
+            request.onerror = () =>{
                 console.log('Item not added to database');
             }
     
-            request.onecomplete = () =>{
+            request.oncomplete = () =>{
                 console.log('Transaction completed');
                 displayData();
             }
@@ -58,11 +58,11 @@ window.onload = () => {
         let db = e.target.result;
         let objectStore = db.createObjectStore('contacts', {keyPath: 'id', autoincrement: true});
 
-        objectStore.createindex('name', 'name', {unique: true});
-        objectStore.createindex('adress', 'adress', {unique: false});
-        objectStore.createindex('phone', 'phone', {unique: false});
-        objectStore.createindex('email', 'email', {unique: true});
-        objectStore.createindex('url', 'url', {unique: false});
+        objectStore.createIndex('name', 'name', {unique: true});
+        objectStore.createIndex('address', 'address', {unique: false});
+        objectStore.createIndex('phone', 'phone', {unique: false});
+        objectStore.createIndex('email', 'email', {unique: true});
+        objectStore.createIndex('url', 'url', {unique: false});
 
         console.log('Database setup complete');
     };
@@ -80,26 +80,26 @@ window.onload = () => {
         const transaction = db.transaction('contacts', 'readonly');
         const objectStore = transaction.objectStore('contacts');
 
-        objectStore.openCursor().onesuccess = (e) =>{
+        objectStore.openCursor().onsuccess = (e) =>{
             let cursor = e.target.result;
 
             if (cursor){
                 let tr = document.createElement('tr');
 
                 let tdName = document.createElement('td');
-                let tdAdress = document.createElement('td');
+                let tdaddress = document.createElement('td');
                 let tdPhone = document.createElement('td');
                 let tdEmail = document.createElement('td');
                 let tdUrl = document.createElement('td');
 
                 tdName.textContent = cursor.value.name;
-                tdAdress.textContent = cursor.value.address;
+                tdaddress.textContent = cursor.value.address;
                 tdPhone.textContent = cursor.value.phone;
                 tdEmail.textContent = cursor.value.email;
                 tdUrl.textContent = cursor.value.url;
 
                 tr.appendChild(tdName);
-                tr.appendChild(tdAdress);
+                tr.appendChild(tdaddress);
                 tr.appendChild(tdPhone);
                 tr.appendChild(tdEmail);
                 tr.appendChild(tdUrl);
@@ -130,12 +130,12 @@ window.onload = () => {
         let objectStore = db.transaction('contacts', 'readwrite').objectStore('contacts');
         let request = objectStore.delete(id);
 
-        request.onesuccess = () =>{
+        request.onsuccess = () =>{
             console.log('Item deleted from database');
             displayData();
         };
 
-        request.oneerror = () =>{
+        request.onerror = () =>{
             console.log('Item not deleted from database');
         };
     };
