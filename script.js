@@ -31,25 +31,30 @@ window.onload = () => {
                 url: urlInput.value
             };
     
-            let transaction = db.transaction(['contacts'], 'readwrite');
-            let objectStore = transaction.objectStore('contacts');
-            var request = objectStore.add(newItem);
+            if (db.objectStoreNames.contains('contacts')){
+                let transaction = db.transaction(['contacts'], 'readwrite');
+                let objectStore = transaction.objectStore('contacts');
+                var request = objectStore.add(newItem);
+            
+
+                request.onsuccess = () =>{
+                    console.log('Item added to database');
+                    nameInput.value = "";
+                    addressInput.value = "";
+                    phoneInput.value = "";
+                    emailInput.value = "";
+                    urlInput.value = "";
+                }
     
-            request.onsuccess = () =>{
-                console.log('Item added to database');
-                nameInput.value = "";
-                addressInput.value = "";
-                phoneInput.value = "";
-                emailInput.value = "";
-                urlInput.value = "";
-            }
-    
-            request.onerror = () =>{
-                console.log('Item not added to database');
-            } 
-            transaction.oncomplete = () =>{
-                console.log('Transaction completed');
-                displayData();
+                request.onerror = () =>{
+                    console.log('Item not added to database');
+                } 
+                transaction.oncomplete = () =>{
+                    console.log('Transaction completed');
+                    displayData();
+                };
+            } else{
+                console.log("Object store 'contacts' does not exist");
             }
         }
         displayData();
